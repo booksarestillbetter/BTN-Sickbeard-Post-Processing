@@ -1,20 +1,44 @@
 #!/usr/bin/env bash
+# Script that removes the file from tranmission
+# and sym links it back from the new renamed version
 
-LOGFILE="/customscripts/symlinks.log"
+# path to a directory that is writable by the tranmission user
+LOGFILE="/customscripts/sb2transmission.log"
+
+# Folder that SB processes
 SBWATCH="/sbwatch"
-SEED="/downloads/finished"
-TFILE="default-file-so-we-do-not-remove-the-hole-seed-dir-if-error.txt"
 
-echo "New [1]: $1" >> "$LOGFILE"
-echo "old [2]: $2" >> "$LOGFILE"
-echo "creating symlink" >> "$LOGFILE"
+# Location where transmission seeds from; download-dir
+SEED="/downloads/finished"
+
+# Turn on to get a more detailed output for commands
+DEBUG=true
+
+########################################################
+# do not edit below, unless you know what you are doing.
+TFILE="default-file-so-we-do-not-remove-the-hole-seed-dir-if-error.txt"
+DATE=`date`
+
+echo "" >> "$LOGFILE"
+echo "sickbeard.sh running on $DATE" >> "$LOGFILE"
+echo "Sick-Beard Watch dir $SBWATCH" >> "$LOGFILE"
+echo "Seed folder $SEED" >> "$LOGFILE"
+echo "Final location: $1" >> "$LOGFILE"
+echo "Sourced from: $2" >> "$LOGFILE"
 
 TFILE="${2##$SBWATCH}"
 echo "$TFILE" >> "$LOGFILE"
 
-#no do the removal and link
-echo "rm -rf $SEED$TFILE" >> "$LOGFILE"
+# remove the file transmission is seeding from 
+echo "Removing $SEED" >> "$LOGFILE"
+if [ "$DEBUG" == "true" ]; then
+	echo "rm -rf $SEED$TFILE" >> "$LOGFILE"
+fi
 rm -rf "$SEED$TFILE"
 
-echo "ln -s $1 $SEED$TFILE" >> "$LOGFILE"
+# Create Symlinks back to the seed folder
+echo "Creating symlink to $SEED" >> "$LOGFILE"
+if [ "$DEBUG" == "true" ]; then
+	echo "ln -s $1 $SEED$TFILE" >> "$LOGFILE"
+fi
 ln -s "$1" "$SEED$TFILE"
