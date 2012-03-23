@@ -2,7 +2,17 @@
 # Transmission script to move files to a Sick-Beard
 # directory to be processed.
 
-#path to a directory that is writable by the tranmission user
+# IF YOUR SBWATCH DIR, AND SEED DIR ARE ON
+# DIFFERENT FILE SYSTEMS THEN YOU MUST SET 
+# THIS OPTION TO false
+USEHARDLINKS=true
+
+# Please do not use the Slickbeard.sh script if
+# the above option is set to true. As it creates
+# hard links thats can be modified without affecting
+# the original file.
+
+# path to a directory that is writable by the tranmission user
 LOGFILE="/customscripts/transmission2sb.log"
 
 # Folder that SB processes
@@ -21,7 +31,7 @@ TR_PASSWORD="password"
 TVTR="xxxxxxxxxxx.net"
 
 # Turn on to get a more detailed output for commands
-DEBUG=false ; true/false
+DEBUG=false 
 
 ########################################################
 # do not edit below, unless you know what you are doing.
@@ -38,9 +48,8 @@ echo "Working on $TR_DOWNLOADED_PATH" >> "$LOGFILE"
 
 # What to do if tracker matches TVTR
 if [ "$(transmission-remote $TR_HOST -n $TR_USERNAME:$TR_PASSWORD -t $TR_TORRENT_ID -it|grep $TVTR)" ]; then
-#echo "$TR_DOWNLOADED_PATH" >> "$SBWATCH/$TR_TORRENT_NAME.path"
-#echo "$TR_TORRENT_ID" >> "$SBWATCH/$TR_TORRENT_NAME.id"
 echo "Copying file to SB process directory" >> "$LOGFILE"
 if [ "$DEBUG" == "true" ]; then echo "cp -vR $TR_DOWNLOADED_PATH $SBWATCH" >> "$LOGFILE" fi
-cp -vR "$TR_DOWNLOADED_PATH" "$SBWATCH" >> "$LOGFILE"
+if [ "$USEHARDLINKS" == "true" ]; then cp -val "$TR_DOWNLOADED_PATH" "$SBWATCH" >> "$LOGFILE" >> "$LOGFILE" fi
+if [ "$USEHARDLINKS" == "false" ]; then cp -vR "$TR_DOWNLOADED_PATH" "$SBWATCH" >> "$LOGFILE" >> "$LOGFILE" fi
 fi
